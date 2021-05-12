@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:katepeaofficer/states/authen.dart';
 import 'package:katepeaofficer/states/my_service.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 final Map<String, WidgetBuilder> map = {
   '/authen': (BuildContext context) => Authen(),
@@ -10,9 +11,20 @@ final Map<String, WidgetBuilder> map = {
 
 String initialRoute;
 
-void main(){
-  initialRoute = '/authen';
-  runApp(MyApp());
+Future<Null> main()async{
+  
+  WidgetsFlutterBinding.ensureInitialized();
+  SharedPreferences preferences = await SharedPreferences.getInstance();  // ประกาศเครื่องมือที่จะใช้
+  String employedid = preferences.getString('employedid'); // ฝั่งค่าไว้บน แอป 
+  if (employedid == null) {
+    initialRoute = '/authen';
+    runApp(MyApp());
+  } else {
+    initialRoute = '/myservice';
+    runApp(MyApp());
+  }
+
+
 }
 
 class MyApp extends StatelessWidget {
@@ -21,7 +33,7 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       routes: map,
       initialRoute: initialRoute,
-      theme: ThemeData(primarySwatch: Colors.yellow),
+      theme: ThemeData(primarySwatch: Colors.purple),
     );
   }
 }

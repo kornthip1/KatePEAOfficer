@@ -7,6 +7,7 @@ import 'package:katepeaofficer/utility/dialog.dart';
 import 'package:katepeaofficer/utility/my_constant.dart';
 import 'package:katepeaofficer/widgets/show_image.dart';
 import 'package:katepeaofficer/widgets/show_title.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class Authen extends StatefulWidget {
   @override
@@ -66,7 +67,7 @@ class _AuthenState extends State<Authen> {
     String api =
         '${MyConstant.domain}/boyproj/getUserWhereUser.php?isAdd=true&user=$user';
     await Dio().get(api).then(
-      (value) {
+      (value) async {
         print('###  value = $value');
         if (value.toString() == 'null') {
           normalDialog(context, 'User False', 'No $user in my database');
@@ -74,15 +75,17 @@ class _AuthenState extends State<Authen> {
           for (var item in json.decode(value.data)) {
             UserModel model = UserModel.fromMap(item);
             if (password == model.password) {
+              print('### Remember  $remember');
+              if (remember) {
+                SharedPreferences preferences =
+                    await SharedPreferences.getInstance();
+                preferences.setString('name', model.name);
+                preferences.setString('employedid', model.employedid);
 
-                if (remember) {
-                  
-                  
-                } else {
-                  routeToService();
-                }
-
-              
+                routeToService();
+              } else {
+                routeToService();
+              }
             } else {
               normalDialog(context, 'password False',
                   'Please try again Password False!');
@@ -94,8 +97,7 @@ class _AuthenState extends State<Authen> {
   }
 
   void routeToService() {
-    Navigator.pushNamedAndRemoveUntil(
-        context, '/myservice', (route) => false);
+    Navigator.pushNamedAndRemoveUntil(context, '/myservice', (route) => false);
   }
 
   Container buildRemember() {
