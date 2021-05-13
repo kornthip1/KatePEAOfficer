@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
+import 'package:katepeaofficer/models/information_model.dart';
 import 'package:katepeaofficer/models/user_model.dart';
 import 'package:katepeaofficer/utility/dialog.dart';
 import 'package:katepeaofficer/utility/my_constant.dart';
@@ -57,7 +58,7 @@ class _AuthenState extends State<Authen> {
             checkAuthen(userController.text, passwordController.text);
           }
         },
-        child: Text('Login'),
+        child: Text('123'),
       ),
     );
   }
@@ -77,12 +78,33 @@ class _AuthenState extends State<Authen> {
             if (password == model.password) {
               print('### Remember  $remember');
               if (remember) {
-                SharedPreferences preferences =
-                    await SharedPreferences.getInstance();
-                preferences.setString('name', model.name);
-                preferences.setString('employedid', model.employedid);
+                //Temporary  wait Real API Login
+                String path =
+                    'https://wesafe.pea.co.th/webservicejson/api/values/job/${model.employedid}';
+                print('######  path ===>> $path');
+                await Dio().get(path).then((value) async {
+                  print('###### value ====>>>  $value');
+                  for (var item in value.data) {
+                    InformationModel informationModel =
+                        InformationModel.fromJson(item);
+                    SharedPreferences preferences =
+                        await SharedPreferences.getInstance();
+                    preferences.setString(
+                        MyConstant.keyFIRSTNAME, informationModel.fIRSTNAME);
+                    preferences.setString(
+                        MyConstant.keyLASTNAME, informationModel.lASTNAME);
+                    preferences.setString(
+                        MyConstant.keyEmployedid, informationModel.eMPLOYEEID);
+                    preferences.setString(
+                        MyConstant.keyDEPTNAME, informationModel.dEPTNAME);
+                    preferences.setString(
+                        MyConstant.keyREGIONCODE, informationModel.rEGIONCODE);
+                    preferences.setString(
+                        MyConstant.keyTEAM, informationModel.tEAM);
 
-                routeToService();
+                    routeToService();
+                  }
+                });
               } else {
                 routeToService();
               }

@@ -2,6 +2,7 @@ import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:katepeaofficer/models/information_model.dart';
 import 'package:katepeaofficer/models/job_model.dart';
+import 'package:katepeaofficer/states/record_new_job.dart';
 import 'package:katepeaofficer/widgets/show_progress.dart';
 import 'package:katepeaofficer/widgets/show_title.dart';
 
@@ -71,8 +72,16 @@ class _RecordJobState extends State<RecordJob> {
           : ListView.builder(
               itemCount: jobModelsForMainName.length,
               itemBuilder: (context, index) => GestureDetector(
-                              child: Card(
-                  color: index % 2 == 0 ? Colors.grey[400] : Colors.grey.shade50,
+                onTap: () => Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) =>
+                        RecordNewJob(jobModel: jobModelsForMainName[index]),
+                  ),
+                ),
+                child: Card(
+                  color:
+                      index % 2 == 0 ? Colors.grey[400] : Colors.grey.shade50,
                   child: Padding(
                     padding: const EdgeInsets.all(8.0),
                     child: ShowTitle(
