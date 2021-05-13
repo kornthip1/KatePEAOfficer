@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:katepeaofficer/models/information_model.dart';
 import 'package:katepeaofficer/models/job_model.dart';
 import 'package:katepeaofficer/widgets/show_progress.dart';
+import 'package:katepeaofficer/widgets/show_title.dart';
 
 class RecordJob extends StatefulWidget {
   final InformationModel model;
@@ -46,7 +47,6 @@ class _RecordJobState extends State<RecordJob> {
       String name = names[0];
       bool found = false;
       jobModelsForMainName.add(jobModels[0]);
-      
 
       for (var i = 0; i < jobModels.length; i++) {
         if (name == jobModels[i].menuMainName && !found) {
@@ -70,8 +70,18 @@ class _RecordJobState extends State<RecordJob> {
           ? ShowProgress()
           : ListView.builder(
               itemCount: jobModelsForMainName.length,
-              itemBuilder: (context, index) =>
-                  Text(jobModelsForMainName[index].menuMainName),
+              itemBuilder: (context, index) => GestureDetector(
+                              child: Card(
+                  color: index % 2 == 0 ? Colors.grey[400] : Colors.grey.shade50,
+                  child: Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: ShowTitle(
+                      title: jobModelsForMainName[index].menuMainName,
+                      index: 0,
+                    ),
+                  ),
+                ),
+              ),
             ),
     );
   }
