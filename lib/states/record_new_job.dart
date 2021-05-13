@@ -19,6 +19,8 @@ class RecordNewJob extends StatefulWidget {
 }
 
 class _RecordNewJobState extends State<RecordNewJob> {
+  //ElevatedButton.icon(onPressed: (){}, icon: Icon(Icons.arrow_downward), label: Text('Next'),),
+
   JobModel jobModel;
   bool load = true;
   double size;
@@ -26,11 +28,13 @@ class _RecordNewJobState extends State<RecordNewJob> {
   final formkey = GlobalKey<FormState>();
   List<RecordModel> recordModels = [];
   String deptName, dateTimeNow;
-  //String choose;
   List<String> chooses = [];
   int indexChoose = -1;
-  //final formKey2 = GlobalKey<FormState>();
-  //TextEditingController jobController
+
+  String namejob;
+  List<bool> vidibles = [];
+  int indexVisible = 0;
+  List<int> indexVisibles = [];
 
   @override
   void initState() {
@@ -54,10 +58,15 @@ class _RecordNewJobState extends State<RecordNewJob> {
 
         setState(() {
           recordModels.add(model);
+          vidibles.add(false);
           load = false;
+          indexVisibles.add(indexVisible);
         });
       }
 
+      indexVisible++;
+
+      print('#### visible ===> $vidibles');
       setState(() {
         load = false;
       });
@@ -89,10 +98,24 @@ class _RecordNewJobState extends State<RecordNewJob> {
             ),
           ),
         ),
-        ElevatedButton.icon(
-          onPressed: () {},
-          icon: Icon(Icons.arrow_downward),
-          label: Text('Next'),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.end,
+          children: [
+            Container(
+              margin: EdgeInsets.only(right: 30),
+              child: ElevatedButton.icon(
+                onPressed: () {
+                  if (formkey.currentState.validate()) {
+                    setState(() {
+                      namejob = jobController.text;
+                    });
+                  }
+                },
+                icon: Icon(Icons.arrow_downward),
+                label: Text('Next'),
+              ),
+            ),
+          ],
         ),
       ],
     );
@@ -130,7 +153,11 @@ class _RecordNewJobState extends State<RecordNewJob> {
           children: [
             buildHead(),
             buildSecond(),
-            buildJob(),
+            namejob == null
+                ? buildJob()
+                : ShowTitle(
+                    title: 'Name Job => $namejob',
+                  ),
             buildListView(),
           ],
         ),
@@ -188,15 +215,30 @@ class _RecordNewJobState extends State<RecordNewJob> {
   }
 
   Widget type0() => Text('No Job.');
-  Widget type1(RecordModel model) => Column(
+  Widget type1(RecordModel model ,int indexChooseType ) => Column(
         children: [
           ShowTitle(
             title: model.menuChecklistName,
           ),
-          ElevatedButton(onPressed: () {}, child: Text('Check')),
+          ElevatedButton(
+            onPressed: () {},
+            child: Text('Check'),
+          ),
+          vidibles[indexVisibles[indexChooseType]]
+              ? Row(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: [
+                    ElevatedButton.icon(
+                      onPressed: () {},
+                      icon: Icon(Icons.arrow_downward),
+                      label: Text('Next123'),
+                    ),
+                  ],
+                )
+              : SizedBox(),
         ],
       );
-  Widget type2(RecordModel model) {
+  Widget type2(RecordModel model,int indexChooseType) {
     int amountPic = model.quantityImg;
     List<File> files = [];
     for (var i = 0; i < amountPic; i++) {
@@ -249,11 +291,22 @@ class _RecordNewJobState extends State<RecordNewJob> {
             ],
           ),
         ),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.end,
+          children: [
+            ElevatedButton.icon(
+              onPressed: () {},
+              icon: Icon(Icons.arrow_downward),
+              label: Text('Next'),
+            ),
+          ],
+        ),
+        
       ],
     );
   }
 
-  Widget type3(RecordModel model) => Column(
+  Widget type3(RecordModel model,int indexChooseType) => Column(
         children: [
           ShowTitle(
             title: model.menuChecklistName,
@@ -264,10 +317,20 @@ class _RecordNewJobState extends State<RecordNewJob> {
               buildFormRecord(),
             ],
           ),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.end,
+            children: [
+              ElevatedButton.icon(
+                onPressed: () {},
+                icon: Icon(Icons.arrow_downward),
+                label: Text('Next'),
+              ),
+            ],
+          ),
         ],
       );
 
-  Widget type4(RecordModel model) {
+  Widget type4(RecordModel model,int indexChooseType) {
     chooses.add(null);
 
     return Column(
@@ -308,25 +371,38 @@ class _RecordNewJobState extends State<RecordNewJob> {
               ),
             ),
           ],
-        )
+        ),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.end,
+          children: [
+            ElevatedButton.icon(
+              onPressed: () {},
+              icon: Icon(Icons.arrow_downward),
+              label: Text('Next'),
+            ),
+          ],
+        ),
       ],
     );
   }
 
+  int indexChooseType = -1;
+
   Widget createType(RecordModel recordModel) {
+     indexChooseType++;
     switch (int.parse(recordModel.type)) {
       case 1:
-        return type1(recordModel);
+        return type1(recordModel,indexChooseType);
         break;
       case 2:
-        return type2(recordModel);
+        return type2(recordModel,indexChooseType);
         break;
       case 3:
-        return type3(recordModel);
+        return type3(recordModel,indexChooseType);
         break;
       case 4:
         indexChoose++;
-        return type4(recordModel);
+        return type4(recordModel,indexChooseType);
         break;
       default:
         return type0();
