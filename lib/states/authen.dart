@@ -66,14 +66,13 @@ class _AuthenState extends State<Authen> {
   Future<Null> checkAuthen(String user, String password) async {
     print('## user = $user , password = $password');
     String api =
-        '${MyConstant.domain}/boyproj/getUserWhereUser.php?isAdd=true&user=$user';
+        'https://wesafe.pea.co.th/webservicejson/api/values/GetUser/$user';
+        print('############  api ===>> $api');
     await Dio().get(api).then(
       (value) async {
+        
         print('###  value = $value');
-        if (value.toString() == 'null') {
-          normalDialog(context, 'User False', 'No $user in my database');
-        } else {
-          for (var item in json.decode(value.data)) {
+        for (var item in value.data) {
             UserModel model = UserModel.fromMap(item);
             if (password == model.password) {
               print('### Remember  $remember');
@@ -112,10 +111,9 @@ class _AuthenState extends State<Authen> {
               normalDialog(context, 'password False',
                   'Please try again Password False!');
             }
-          }
-        }
+          }//end for
       },
-    );
+    ).catchError((onError)=>normalDialog(context, 'User False', 'try again'));
   }
 
   void routeToService() {

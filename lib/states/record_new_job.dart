@@ -1,9 +1,11 @@
 import 'dart:io';
+import 'dart:math';
 
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:katepeaofficer/models/job_model.dart';
 import 'package:katepeaofficer/models/record_model.dart';
+import 'package:katepeaofficer/states/Process_record.dart';
 import 'package:katepeaofficer/utility/my_constant.dart';
 import 'package:katepeaofficer/widgets/show_icon_image.dart';
 import 'package:katepeaofficer/widgets/show_image.dart';
@@ -35,6 +37,7 @@ class _RecordNewJobState extends State<RecordNewJob> {
   List<bool> vidibles = [];
   int indexVisible = 0;
   List<int> indexVisibles = [];
+  String idDoc;
 
   @override
   void initState() {
@@ -43,6 +46,8 @@ class _RecordNewJobState extends State<RecordNewJob> {
     jobModel = widget.jobModel;
     readData();
   }
+
+
 
   Future<Null> readData() async {
     SharedPreferences peferences = await SharedPreferences.getInstance();
@@ -58,9 +63,7 @@ class _RecordNewJobState extends State<RecordNewJob> {
 
         setState(() {
           recordModels.add(model);
-          vidibles.add(false);
           load = false;
-          indexVisibles.add(indexVisible);
         });
       }
 
@@ -74,8 +77,11 @@ class _RecordNewJobState extends State<RecordNewJob> {
   }
 
   Widget buildJob() {
+    int i = Random().nextInt(100000);
+    idDoc = 'pea$i';
     return Column(
       children: [
+        Text('Test Id => $idDoc'),
         Form(
           key: formkey,
           child: Container(
@@ -106,12 +112,20 @@ class _RecordNewJobState extends State<RecordNewJob> {
               child: ElevatedButton.icon(
                 onPressed: () {
                   if (formkey.currentState.validate()) {
-                    setState(() {
-                      namejob = jobController.text;
-                    });
+                    namejob = jobController.text;
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => ProcessRecord(
+                          recordModels: recordModels,
+                          nameRecord: namejob,
+                          idDoc: idDoc,
+                        ),
+                      ),
+                    );
                   }
                 },
-                icon: Icon(Icons.arrow_downward),
+                icon: Icon(Icons.arrow_right),
                 label: Text('Next'),
               ),
             ),
@@ -121,19 +135,7 @@ class _RecordNewJobState extends State<RecordNewJob> {
     );
   }
 
-  Widget buildFormRecord() {
-    return Container(
-      margin: EdgeInsets.only(top: 16),
-      width: size * 0.6,
-      child: TextFormField(
-        decoration: InputDecoration(
-          prefixIcon: Icon(Icons.book_online),
-          labelText: 'บันทึกข้อความ :',
-          border: OutlineInputBorder(),
-        ),
-      ),
-    );
-  }
+  
 
   @override
   Widget build(BuildContext context) {
@@ -153,43 +155,44 @@ class _RecordNewJobState extends State<RecordNewJob> {
           children: [
             buildHead(),
             buildSecond(),
-            namejob == null
-                ? buildJob()
-                : ShowTitle(
-                    title: 'Name Job => $namejob',
-                  ),
-            buildListView(),
+            buildJob(),
+            // namejob == null
+            //     ? buildJob()
+            //     : ShowTitle(
+            //         title: 'Name Job => $namejob',
+            //       ),
+            // buildListView(),
           ],
         ),
       ),
     );
   }
 
-  Widget buildListView() {
-    return Container(
-      margin: EdgeInsets.all(16),
-      child: ListView.builder(
-        shrinkWrap: true,
-        physics: ScrollPhysics(),
-        itemCount: recordModels.length,
-        itemBuilder: (context, index) => Card(
-          child: Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                ShowTitle(
-                  title: recordModels[index].menuChecklistName,
-                  index: 1,
-                ),
-                createType(recordModels[index]),
-              ],
-            ),
-          ),
-        ),
-      ),
-    );
-  }
+  // Widget buildListView() {
+  //   return Container(
+  //     margin: EdgeInsets.all(16),
+  //     child: ListView.builder(
+  //       shrinkWrap: true,
+  //       physics: ScrollPhysics(),
+  //       itemCount: recordModels.length,
+  //       itemBuilder: (context, index) => Card(
+  //         child: Padding(
+  //           padding: const EdgeInsets.all(8.0),
+  //           child: Column(
+  //             crossAxisAlignment: CrossAxisAlignment.start,
+  //             children: [
+  //               ShowTitle(
+  //                 title: recordModels[index].menuChecklistName,
+  //                 index: 1,
+  //               ),
+  //               createType(recordModels[index]),
+  //             ],
+  //           ),
+  //         ),
+  //       ),
+  //     ),
+  //   );
+  // }
 
   Column buildSecond() {
     return Column(
@@ -214,123 +217,13 @@ class _RecordNewJobState extends State<RecordNewJob> {
     );
   }
 
-  Widget type0() => Text('No Job.');
-  Widget type1(RecordModel model ,int indexChooseType ) => Column(
-        children: [
-          ShowTitle(
-            title: model.menuChecklistName,
-          ),
-          ElevatedButton(
-            onPressed: () {},
-            child: Text('Check'),
-          ),
-          vidibles[indexVisibles[indexChooseType]]
-              ? Row(
-                  mainAxisAlignment: MainAxisAlignment.end,
-                  children: [
-                    ElevatedButton.icon(
-                      onPressed: () {},
-                      icon: Icon(Icons.arrow_downward),
-                      label: Text('Next123'),
-                    ),
-                  ],
-                )
-              : SizedBox(),
-        ],
-      );
-  Widget type2(RecordModel model,int indexChooseType) {
-    int amountPic = model.quantityImg;
-    List<File> files = [];
-    for (var i = 0; i < amountPic; i++) {
-      files.add(null);
-    }
+ 
+  
+  
 
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        ShowTitle(
-          title: model.menuChecklistName,
-        ),
-        ShowTitle(
-          title: 'จำนวนรูป : $amountPic  รูป',
-        ),
-        Divider(
-          thickness: 1,
-        ),
-        ListView.builder(
-          shrinkWrap: true,
-          physics: ScrollPhysics(),
-          itemCount: files.length,
-          itemBuilder: (context, index) => Column(
-            children: [
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceAround,
-                children: [
-                  Container(
-                    width: 120,
-                    height: 120,
-                    child: ShowIconImage(),
-                  ),
-                  Column(
-                    children: [
-                      IconButton(
-                        icon: Icon(Icons.add_a_photo),
-                        onPressed: () {},
-                      ),
-                      IconButton(
-                        icon: Icon(Icons.add_photo_alternate),
-                        onPressed: () {},
-                      ),
-                    ],
-                  ),
-                ],
-              ),
-              Divider(
-                thickness: 1,
-              ),
-            ],
-          ),
-        ),
-        Row(
-          mainAxisAlignment: MainAxisAlignment.end,
-          children: [
-            ElevatedButton.icon(
-              onPressed: () {},
-              icon: Icon(Icons.arrow_downward),
-              label: Text('Next'),
-            ),
-          ],
-        ),
-        
-      ],
-    );
-  }
+  
 
-  Widget type3(RecordModel model,int indexChooseType) => Column(
-        children: [
-          ShowTitle(
-            title: model.menuChecklistName,
-          ),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              buildFormRecord(),
-            ],
-          ),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.end,
-            children: [
-              ElevatedButton.icon(
-                onPressed: () {},
-                icon: Icon(Icons.arrow_downward),
-                label: Text('Next'),
-              ),
-            ],
-          ),
-        ],
-      );
-
-  Widget type4(RecordModel model,int indexChooseType) {
+  Widget type4(RecordModel model, int indexChooseType) {
     chooses.add(null);
 
     return Column(
@@ -388,25 +281,5 @@ class _RecordNewJobState extends State<RecordNewJob> {
 
   int indexChooseType = -1;
 
-  Widget createType(RecordModel recordModel) {
-     indexChooseType++;
-    switch (int.parse(recordModel.type)) {
-      case 1:
-        return type1(recordModel,indexChooseType);
-        break;
-      case 2:
-        return type2(recordModel,indexChooseType);
-        break;
-      case 3:
-        return type3(recordModel,indexChooseType);
-        break;
-      case 4:
-        indexChoose++;
-        return type4(recordModel,indexChooseType);
-        break;
-      default:
-        return type0();
-        break;
-    }
-  }
+  
 }
